@@ -1,42 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A346C398-D3A2-40F2-A355-809D7D6A167A}</ProjectGuid>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{26BF5A5F-B334-4FDC-AA7A-DEAC885D8CE8}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SpriteUtility</RootNamespace>
+    <RootNamespace>Boxer</RootNamespace>
     <AssemblyName>Boxer</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <ExpressionBlendVersion>12.0.41002.1</ExpressionBlendVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>SpriteUtility.Program</StartupObject>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="fwd.farseer">
@@ -45,252 +65,223 @@
     <Reference Include="fwd.primitives">
       <HintPath>..\..\lib\fwd.primitives.dll</HintPath>
     </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Extras.WPF45">
+      <HintPath>..\packages\MvvmLightLibs.4.2.30.0\lib\net45\GalaSoft.MvvmLight.Extras.WPF45.dll</HintPath>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.WPF45">
+      <HintPath>..\packages\MvvmLightLibs.4.2.30.0\lib\net45\GalaSoft.MvvmLight.WPF45.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\packages\CommonServiceLocator.1.2\lib\portable-windows8+net40+sl5+windowsphone8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.4.2.30.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
     <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xceed.Wpf.AvalonDock">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.DataGrid">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BitmapTools.cs" />
-    <Compile Include="Camera2D.cs" />
-    <Compile Include="CustomControls\StackPanel.cs">
-      <SubType>Component</SubType>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Controls\ImageViewer.xaml.cs">
+      <DependentUpon>ImageViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Data\Export\FolderExport.cs" />
-    <Compile Include="Data\Folder.cs" />
+    <Compile Include="Converters\Converters.cs" />
+    <Compile Include="Core\AutoRefreshCollectionViewSource.cs" />
+    <Compile Include="Core\BitmapTools.cs" />
+    <Compile Include="Core\Camera2D.cs" />
+    <Compile Include="Core\CommandManager.cs" />
+    <Compile Include="Core\Glue.cs" />
+    <Compile Include="Core\ImageHelper.cs" />
+    <Compile Include="Core\JsonSerializer.cs" />
+    <Compile Include="Core\Primitives2D.cs" />
+    <Compile Include="Core\SmartCommand.cs" />
+    <Compile Include="Core\XmlColor.cs" />
     <Compile Include="Data\Export\DocumentExport.cs" />
-    <Compile Include="Data\Export\ImageFrameExport.cs" />
+    <Compile Include="Data\Export\FolderExport.cs" />
     <Compile Include="Data\Export\ImageDataExport.cs" />
-    <Compile Include="Data\ImageFrame.cs" />
-    <Compile Include="Data\Polygon.cs" />
+    <Compile Include="Data\Export\ImageFrameExport.cs" />
     <Compile Include="Data\Export\PolygonExport.cs" />
-    <Compile Include="Data\PolyPoint.cs" />
+    <Compile Include="Data\Export\PolygonGroupExport.cs" />
     <Compile Include="Data\Export\PolyPointExport.cs" />
-    <Compile Include="Forms\PolyForm.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\PolyForm.Designer.cs">
-      <DependentUpon>PolyForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PreferencesForm.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\PreferencesForm.Designer.cs">
-      <DependentUpon>PreferencesForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FolderProperties.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\FolderProperties.Designer.cs">
-      <DependentUpon>FolderProperties.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Helpers\ImageHelper.cs" />
-    <Compile Include="JsonSerializer.cs" />
-    <Compile Include="Primitives2D.cs" />
+    <Compile Include="Data\Folder.cs" />
+    <Compile Include="Data\ImageFrame.cs" />
+    <Compile Include="Data\ImageData.cs" />
+    <Compile Include="Data\IName.cs" />
+    <Compile Include="Data\Polygon.cs" />
+    <Compile Include="Data\PolygonGroup.cs" />
+    <Compile Include="Data\PolyPoint.cs" />
     <Compile Include="Services\Shape.cs" />
     <Compile Include="Services\TraceService.cs" />
-    <Compile Include="Stubs\CustomSelection.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="ViewModel\AutoTraceWindowVM.cs" />
+    <Compile Include="ViewModel\ImageViewVM.cs" />
+    <Compile Include="ViewModel\DocumentViewVM.cs" />
+    <Compile Include="ViewModel\ImageFrameViewVM.cs" />
+    <Compile Include="ViewModel\FolderViewVM.cs" />
+    <Compile Include="ViewModel\MainWindowVM.cs" />
+    <Compile Include="Core\MainViewModel.cs" />
+    <Compile Include="Core\ViewModelLocator.cs" />
+    <Compile Include="ViewModel\PreferencesVM.cs" />
+    <Compile Include="Views\AutoTraceWindow.xaml.cs">
+      <DependentUpon>AutoTraceWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Stubs\CustomSelection.designer.cs">
-      <DependentUpon>CustomSelection.cs</DependentUpon>
+    <Compile Include="Views\ImageView.xaml.cs">
+      <DependentUpon>ImageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Stubs\CustomSelectionPanel.cs">
+    <Compile Include="Views\ImageFrameView.xaml.cs">
+      <DependentUpon>ImageFrameView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FolderView.xaml.cs">
+      <DependentUpon>FolderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DocumentView.xaml.cs">
+      <DependentUpon>DocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Preferences.xaml.cs">
+      <DependentUpon>Preferences.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WinForm\GraphicsDeviceControl.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinForm\GraphicsDeviceService.cs" />
+    <Compile Include="WinForm\ImageViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinForm\ServiceContainer.cs" />
+    <Page Include="Controls\ImageViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\Document.cs" />
-    <Compile Include="Stubs\DocumentStub.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="Data\INode.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Stubs\DocumentStub.Designer.cs">
-      <DependentUpon>DocumentStub.cs</DependentUpon>
+    <Page Include="Resources\Templates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AutoTraceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ImageView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ImageFrameView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\FolderView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\DocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Preferences.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Stubs\FrameStub.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Stubs\FrameStub.Designer.cs">
-      <DependentUpon>FrameStub.cs</DependentUpon>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Data\ImageData.cs" />
-    <Compile Include="Forms\GraphicsDeviceControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="GraphicsDeviceService.cs" />
-    <Compile Include="Forms\ImageProperties.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\ImageProperties.Designer.cs">
-      <DependentUpon>ImageProperties.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Stubs\FolderStub.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Stubs\FolderStub.Designer.cs">
-      <DependentUpon>FolderStub.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Stubs\ImageStub.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Stubs\ImageStub.Designer.cs">
-      <DependentUpon>ImageStub.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ImageViewer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Preferences.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Forms\ProjectProperties.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\ProjectProperties.Designer.cs">
-      <DependentUpon>ProjectProperties.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceContainer.cs" />
-    <Compile Include="Forms\ViewerToolStrip.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\ViewerToolStrip.Designer.cs">
-      <DependentUpon>ViewerToolStrip.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Stubs\PolyStub.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Stubs\PolyStub.Designer.cs">
-      <DependentUpon>PolyStub.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Stubs\PreferencesStub.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Stubs\PreferencesStub.Designer.cs">
-      <DependentUpon>PreferencesStub.cs</DependentUpon>
-    </Compile>
-    <Compile Include="XmlColor.cs" />
-    <EmbeddedResource Include="Forms\PolyForm.resx">
-      <DependentUpon>PolyForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PreferencesForm.resx">
-      <DependentUpon>PreferencesForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FolderProperties.resx">
-      <DependentUpon>FolderProperties.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Stubs\CustomSelection.resx">
-      <DependentUpon>CustomSelection.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Stubs\DocumentStub.resx">
-      <DependentUpon>DocumentStub.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Stubs\FrameStub.resx">
-      <DependentUpon>FrameStub.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImageProperties.resx">
-      <DependentUpon>ImageProperties.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Stubs\FolderStub.resx">
-      <DependentUpon>FolderStub.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Stubs\ImageStub.resx">
-      <DependentUpon>ImageStub.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ProjectProperties.resx">
-      <DependentUpon>ProjectProperties.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <EmbeddedResource Include="Forms\ViewerToolStrip.resx">
-      <DependentUpon>ViewerToolStrip.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Stubs\PolyStub.resx">
-      <DependentUpon>PolyStub.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Stubs\PreferencesStub.resx">
-      <DependentUpon>PreferencesStub.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
+    <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\icon%402x.png">
-      <Link>icon%402x.png</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ArrowNorm.cur">
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Cursors\ArrowNorm.cur">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ArrowNorm.png">
+    <Content Include="Cursors\ArrowOver.cur">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ArrowOver.cur">
+    <Content Include="Cursors\Pen.cur">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ArrowOver.png">
+    <Content Include="Cursors\PenOver.cur">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Center.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PanCursor.cur">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PenOver.cur">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Pen.cur">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Point.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ZoomInCursor.cur">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="ZoomOutCursor.cur">
+    <Content Include="icon%402x.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

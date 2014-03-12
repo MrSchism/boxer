@@ -1,61 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media;
+using Boxer.Core;
 using Newtonsoft.Json;
-using SpriteUtility.Helpers;
+using Image = System.Drawing.Image;
 
-namespace SpriteUtility.Data
+namespace Boxer.Data
 {
-    [Serializable]
-    public class ImageData
+    public sealed class ImageData : NodeWithName
     {
-        private static readonly List<string> FileNameList = new List<string>();
-        private readonly ObservableCollection<ImageFrame> _frames;
+
+        private string _filename;
 
         [JsonProperty("filename")]
-        public string Filename { get; private set; }
-
-        [JsonProperty("name")]
-        public string Name
+        public string Filename
         {
-            get { return Filename; }
-            set
+            get
             {
-                if (Filename != value)
-                {
-                    Filename = TestName(value);
-                    FileNameList.Remove(value);
-                    FileNameList.Add(Filename);
-                    FileNameChanged(this, EventArgs.Empty);
-                }
+                return Name + Extension;
             }
         }
 
+        [JsonProperty("name")]
+        public override string Name {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                var extension = Path.GetExtension(value);
+                var name = value;
+                if (!string.IsNullOrWhiteSpace(extension))
+                {
+                    Extension = extension;
+                    name = Path.GetFileNameWithoutExtension(value);
+                }
+
+                Set(ref _name, name);
+            }
+        }
+
+        private string _extension;
+
+        [JsonProperty("extension")]
+        public string Extension
+        {
+            get { return _extension; }
+            set { Set(ref _extension, value); }
+        }
+
+
         [JsonProperty("frames")]
-        public ObservableCollection<ImageFrame> Frames
+        public override ObservableCollection<INode> Children
         {
-            get { return _frames; }
+            get
+            {
+                return _children;
+            }
+            set
+            {
+                Set(ref _children, value);
+            }
         }
 
-        private ImageData()
+        public ImageData()
         {
-            Filename = "";
-            _frames = new ObservableCollection<ImageFrame>();
-            FileNameChanged += OnFileNameChanged;
+            Name = "New Image";
+            Children = new ObservableCollection<INode>();
         }
 
-        public ImageData(string fileName) : this()
+        [JsonConstructor]
+        public ImageData(ObservableCollection<ImageFrame> frames) : this()
         {
-            using (var stream = File.Open(fileName, FileMode.Open))
+            foreach (var frame in frames)
+            {
+                AddChild(frame);
+            }
+        }
+
+        public ImageData(string filename)
+            : this()
+        {
+            string extension;
+            using (var stream = File.Open(filename, FileMode.Open))
             {
                 using (var image = Image.FromStream(stream))
                 {
-                    var extension = Path.GetExtension(fileName);
+                    extension = Path.GetExtension(filename);
                     var thumbnail = image.GetThumbnailImage(38, 38, null, new IntPtr());
-                    
+
                     if (extension != null && extension.Equals(".png"))
                     {
                         using (var ms = new MemoryStream())
@@ -64,18 +105,19 @@ namespace SpriteUtility.Data
 
                             var frame = new ImageFrame(ms.ToArray(), image.Width, image.Height)
                             {
-                                ImagePath = fileName,
-                                CenterPointX = image.Width/2,
-                                CenterPointY = image.Height/2,
-                                Thumbnail = ImageHelper.ImageToByteArray(thumbnail)
+                                ImagePath = filename,
+                                CenterPointX = image.Width / 2,
+                                CenterPointY = image.Height / 2,
+                                Thumbnail = ImageHelper.ImageToByteArray(thumbnail),
+                                Name = "Frame 1",
                             };
 
-                            _frames.Add(frame);
+                            AddChild(frame);
                         }
                     }
                     else
                     {
-                        extension = Path.GetExtension(fileName);
+                        extension = Path.GetExtension(filename);
                         if (extension != null && extension.Equals(".gif"))
                         {
                             var dimension = new FrameDimension(image.FrameDimensionsList[0]);
@@ -92,15 +134,17 @@ namespace SpriteUtility.Data
                                 {
                                     image.Save(ms, ImageFormat.Png);
 
-                                    _frames.Add(new ImageFrame(ms.ToArray(), image.Width, image.Height));
-                                    _frames[i].CenterPointX = image.Width/2;
-                                    _frames[i].CenterPointY = image.Height/2;
-                                    _frames[i].Thumbnail = ImageHelper.ImageToByteArray(thumbnail);
-                                    PropertyItem item = image.GetPropertyItem(0x5100); // FrameDelay in libgdiplus
+                                    AddChild(new ImageFrame(ms.ToArray(), image.Width, image.Height));
+                                    var frame = Children[i] as ImageFrame;
 
+                                    frame.CenterPointX = image.Width / 2;
+                                    frame.CenterPointY = image.Height / 2;
+                                    frame.Thumbnail = ImageHelper.ImageToByteArray(thumbnail);
+                                    frame.Name = "Frame " + (i + 1);
+                                    PropertyItem item = image.GetPropertyItem(0x5100); // FrameDelay in libgdiplus
                                     // Time is in 1/100th of a second, in miliseconds
-                                    int time = (item.Value[0] + item.Value[1]*256)*10;
-                                    _frames[i].Duration = time;
+                                    int time = (item.Value[0] + item.Value[1] * 256) * 10;
+                                    frame.Duration = time;
                                 }
                             }
                         }
@@ -108,32 +152,8 @@ namespace SpriteUtility.Data
                 }
             }
 
-            Filename = TestName(Path.GetFileName(fileName));
-            FileNameList.Add(Filename);
-        }
-        
-        public event EventHandler<EventArgs> FileNameChanged;
-
-        protected virtual void OnFileNameChanged(object sender, EventArgs e)
-        {
-        }
-
-        private static string TestName(string fileName)
-        {
-            foreach (string name in FileNameList)
-            {
-                if (fileName == name)
-                {
-                    fileName = Path.GetFileNameWithoutExtension(fileName) + "(1)" + Path.GetExtension(fileName);
-                    return TestName(fileName);
-                }
-            }
-            return fileName;
-        }
-
-        public static void ResetNames()
-        {
-            FileNameList.Clear();
+            Name = Path.GetFileNameWithoutExtension(filename);
+            Extension = extension;
         }
     }
 }

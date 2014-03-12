@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Boxer.Data;
 using Newtonsoft.Json;
 
 namespace SpriteUtility.Data.Export
@@ -16,8 +17,8 @@ namespace SpriteUtility.Data.Export
         public PolygonExport(Polygon poly)
         {
             Name = poly.Name;
-            Points = new List<PolyPointExport>(poly.Points.Count);
-            foreach (var point in poly.Points)
+            Points = new List<PolyPointExport>(poly.Children.Count);
+            foreach (PolyPoint point in poly.Children)
             {
                 Points.Add(new PolyPointExport(point));           
             }

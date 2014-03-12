@@ -1,4 +1,5 @@
 ﻿using System;
+using Boxer.Data;
 using Newtonsoft.Json;
 using SpriteUtility.Data;
 

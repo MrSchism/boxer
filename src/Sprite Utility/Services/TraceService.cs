@@ -2,36 +2,35 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Text;
+using System.Linq;
 using FarseerPhysics;
 using FarseerPhysics.Common;
 using FarseerPhysics.Common.Decomposition;
 using FarseerPhysics.Common.PolygonManipulation;
 using fwd;
 
-namespace SpriteUtility.Services
+namespace Boxer.Services
 {
     public static class TraceService
     {
-        static TraceService()
+        public static void SetDisplayUnitToSimUnitRatio(float simulationRatio)
         {
-            ConvertUnits.SetDisplayUnitToSimUnitRatio(128f);
+            ConvertUnits.SetDisplayUnitToSimUnitRatio(simulationRatio);
         }
 
-        public static Shape CreateSimpleShape(string imagePath, int timeout, StringBuilder spool, bool holeDetection = true, bool strict = false, TriangulationAlgorithm algorithm = TriangulationAlgorithm.Bayazit)
+        public static Shape CreateSimpleShape(Image imageBitmap, int timeout, StringBuilder spool, bool holeDetection = true, bool strict = false, TriangulationAlgorithm algorithm = TriangulationAlgorithm.Bayazit)
         {
             Shape shape = null;
             Action action = () =>
             {
                 try
                 {
-                    shape = BuildShape(imagePath, spool, holeDetection, strict, algorithm);
+                    shape = BuildShape(imageBitmap, spool, holeDetection, strict, algorithm);
                 }
                 catch
                 {
-                    var image = System.IO.Path.GetFileNameWithoutExtension(imagePath);
-                    spool.AppendFormat("{0} - Error creating shape for image", image);
+                    spool.AppendFormat("Error creating shape for image");
                     spool.AppendLine();
                 }
             };
@@ -39,27 +38,25 @@ namespace SpriteUtility.Services
             var result = action.BeginInvoke(null, null);
             if (!result.AsyncWaitHandle.WaitOne(timeout))
             {
-                var image = System.IO.Path.GetFileNameWithoutExtension(imagePath);
-                spool.AppendFormat("{0} - Timed out attempting to create shape", image);
+                spool.AppendFormat("Timed out attempting to create shape");
                 spool.AppendLine();
             }
 
             return shape;
         }
 
-        public static Shape CreateComplexShape(string imagePath, int timeout, StringBuilder spool, float hullTolerance, byte alphaTolerance, bool multiPartDetection, bool holeDetection = true, bool strict = false, TriangulationAlgorithm algorithm = TriangulationAlgorithm.Bayazit)
+        public static Shape CreateComplexShape(Image imageBitmap, int timeout, StringBuilder spool, float hullTolerance, byte alphaTolerance, bool multiPartDetection, bool holeDetection = true, bool strict = false, TriangulationAlgorithm algorithm = TriangulationAlgorithm.Bayazit)
         {
             Shape shape = null;
             Action action = () =>
             {
                 try
                 {
-                    shape = BuildShape(imagePath, spool, hullTolerance, alphaTolerance, multiPartDetection, holeDetection, strict, algorithm);
+                    shape = BuildShape(imageBitmap, spool, hullTolerance, alphaTolerance, multiPartDetection, holeDetection, strict, algorithm);
                 }
                 catch
                 {
-                    var image = System.IO.Path.GetFileNameWithoutExtension(imagePath);
-                    spool.AppendFormat("{0} - Error creating shape for image", image);
+                    spool.AppendFormat("Error creating shape for image");
                     spool.AppendLine();
                 }
             };
@@ -67,34 +64,32 @@ namespace SpriteUtility.Services
             var result = action.BeginInvoke(null, null);
             if (!result.AsyncWaitHandle.WaitOne(timeout))
             {
-                var image = System.IO.Path.GetFileNameWithoutExtension(imagePath);
-                spool.AppendFormat("{0} - Timed out attempting to create shape", image);
+                spool.AppendFormat("Timed out attempting to create shape");
                 spool.AppendLine();
             }
 
             return shape;
         }
 
-        private static Shape BuildShape(string imagePath, StringBuilder spool, bool holeDetection, bool strict, TriangulationAlgorithm algorithm)
+        private static Shape BuildShape(Image imageBitmap, StringBuilder spool, bool holeDetection, bool strict, TriangulationAlgorithm algorithm)
         {
-            var image = Image.FromFile(imagePath);
-            var data = LoadImageData(image);
-            var polygon = PolygonTools.CreatePolygon(data, image.Width, holeDetection);
+            var data = LoadImageData(imageBitmap);
+            var polygon = PolygonTools.CreatePolygon(data, imageBitmap.Width, holeDetection);
 
-            var polygons = new List<Vertices>{ polygon };
-            return ScaleConvertAndPartition(imagePath, spool, strict, image, polygons, algorithm);
+            var polygons = new List<Vertices> { polygon };
+            return ScaleConvertAndPartition(spool, strict, imageBitmap, polygons, algorithm);
         }
 
-        private static Shape BuildShape(string imagePath, StringBuilder spool, float hullTolerance, byte alphaTolerance, bool multiPartDetection, bool holeDetection = true, bool strict = false, TriangulationAlgorithm algorithm = TriangulationAlgorithm.Bayazit)
+        private static Shape BuildShape(Image imageBitmap, StringBuilder spool, float hullTolerance, byte alphaTolerance, bool multiPartDetection, bool holeDetection = true, bool strict = false, TriangulationAlgorithm algorithm = TriangulationAlgorithm.Bayazit)
         {
-            var image = Image.FromFile(imagePath);
-            var data = LoadImageData(image);
-            var polygons = PolygonTools.CreatePolygon(data, image.Width, hullTolerance, alphaTolerance, multiPartDetection, holeDetection);
+            var data = LoadImageData(imageBitmap);
+            var polygons = PolygonTools.CreatePolygon(data, imageBitmap.Width, hullTolerance, alphaTolerance, multiPartDetection, holeDetection);
 
-            return ScaleConvertAndPartition(imagePath, spool, strict, image, polygons, algorithm);
+            return ScaleConvertAndPartition(spool, strict, imageBitmap, polygons, algorithm);
         }
 
-        private static Shape ScaleConvertAndPartition(string imagePath, StringBuilder spool, bool strict, Image image, IEnumerable<Vertices> polygons, TriangulationAlgorithm algorithm)
+
+        private static Shape ScaleConvertAndPartition(StringBuilder spool, bool strict, Image image, IEnumerable<Vertices> polygons, TriangulationAlgorithm algorithm)
         {
             var scale = ConvertUnits.ToSimUnits(1, 1);
             var width = ConvertUnits.ToSimUnits(image.Width);
@@ -115,9 +110,7 @@ namespace SpriteUtility.Services
                     var errors = thisPolygon.CheckPolygon();
                     if (errors != PolygonError.NoError)
                     {
-                        var imageName = System.IO.Path.GetFileNameWithoutExtension(imagePath);
-                        spool.AppendFormat("{1}: Invalid shape ({0})", errors, imageName);
-                        spool.AppendLine();
+                        spool.AppendFormat("Invalid shape ({0})", errors);
                         return null;
                     }
                 }
@@ -130,8 +123,7 @@ namespace SpriteUtility.Services
                 }
                 catch
                 {
-                    var imageName = System.IO.Path.GetFileNameWithoutExtension(imagePath);
-                    spool.AppendFormat("{0}: Cannot triangulate polygon", imageName);
+                    spool.AppendFormat("Cannot triangulate polygon");
                     spool.AppendLine();
                 }
             }

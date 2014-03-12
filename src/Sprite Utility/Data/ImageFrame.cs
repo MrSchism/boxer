@@ -1,57 +1,61 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Boxer.Core;
+using Boxer.Properties;
+using Boxer.Services;
+using Boxer.ViewModel;
+using Boxer.Views;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 
-namespace SpriteUtility.Data
+namespace Boxer.Data
 {
-    [Serializable]
-    public class ImageFrame
+    public sealed class ImageFrame : NodeWithName
     {
         private Rectangle _trimRectangle;
-        private int _duration; //in 1/100 second
-        private bool _isOpen;
 
         [JsonProperty("trim_rectangle")]
         public Rectangle TrimRectangle
         {
             get { return _trimRectangle; }
+            set { Set(ref _trimRectangle, value); }
         }
+
+        private bool _isOpen;
 
         [JsonProperty("is_open")]
         public bool IsOpen
         {
             get { return _isOpen; }
-            set
-            {
-                if (_isOpen != value)
-                {
-                    _isOpen = value;
-                    if (IsOpenChanged != null)
-                    {
-                        IsOpenChanged(this, EventArgs.Empty);
-                    }
-                    Document.Instance.Invalidate(this, EventArgs.Empty);
-                }
-            }
+            set { Set(ref _isOpen, value); }
         }
+
+
+        private int _duration;
 
         [JsonProperty("duration")]
         public int Duration
         {
             get { return _duration; }
-            set { _duration = value; }
+            set { Set(ref _duration, value); }
         }
 
-        [JsonProperty("mapped_center_point_x")]
+         [JsonProperty("mapped_center_point_x")]
         public int MappedCenterPointX
         {
             get
             {
-                if (MainForm.Preferences.TrimToMinimalNonTransparentArea)
+                if (Settings.Default.TrimToMinimalNonTransparentArea)
                 {
-                    return CenterPointX - _trimRectangle.X;
+                    return CenterPointX - TrimRectangle.X;
                 }
                 return CenterPointX;
             }
@@ -62,45 +66,84 @@ namespace SpriteUtility.Data
         {
             get
             {
-                if (MainForm.Preferences.TrimToMinimalNonTransparentArea)
+                if (Settings.Default.TrimToMinimalNonTransparentArea)
                 {
-                    return CenterPointY - _trimRectangle.Y;
+                    return CenterPointY - TrimRectangle.Y;
                 }
                 return CenterPointY;
             }
         }
 
+        private int _centerPointX;
+        private int _centerPointY;
+
         [JsonProperty("center_point_x")]
-        public int CenterPointX { get; set; }
+        public int CenterPointX { get { return _centerPointX; }set { Set(ref _centerPointX, value); } }
 
         [JsonProperty("center_point_y")]
-        public int CenterPointY { get; set; }
+        public int CenterPointY { get { return _centerPointY; } set { Set(ref _centerPointY, value); } }
+
+        private byte[] _data;
 
         [JsonProperty("data")]
-        public byte[] Data { get; private set; }
+        public byte[] Data { get { return _data; } set { Set(ref _data, value); } }
+
+        private int _width;
 
         [JsonProperty("width")]
-        public int Width { get; private set; }
+        public int Width { get { return _width; } set { Set(ref _width, value); } }
+
+        private int _height;
 
         [JsonProperty("height")]
-        public int Height { get; private set; }
+        public int Height { get { return _height; } set { Set(ref _height, value); } }
+
 
         [JsonProperty("polygons")]
-        public ObservableCollection<Polygon> Polygons { get; private set; }
+        public override ObservableCollection<INode> Children
+        {
+            get
+            {
+                return _children;
+            }
+            set
+            {
+                Set(ref _children, value);
+            }
+        }
+
+        private byte[] _thumbnail;
 
         [JsonProperty("thumbnail")]
-        public byte[] Thumbnail { get; set; }
+        public byte[] Thumbnail { get { return _thumbnail; } set { Set(ref _thumbnail, value); } }
+
+        private string _imagePath;
+
+        [JsonIgnore]
+        public ImageSource ThumbnailSource
+        {
+            get { return ImageHelper.ByteArrayToImageSource(Data); }
+        }
 
         [JsonProperty("image_path")]
-        public string ImagePath { get; set; }
+        public string ImagePath { get { return _imagePath; } set { Set(ref _imagePath, value); } }
 
         [JsonConstructor]
+        public ImageFrame(ObservableCollection<PolygonGroup> polygons)
+            : this()
+        {
+            foreach (var polygonGroup in polygons)
+            {
+                AddChild(polygonGroup);
+            }
+        }
+
         public ImageFrame(byte[] data, int width, int height) : this(width, height)
         {
             Data = data;
             using (var imageData = new MemoryStream(Data))
             {
-                _trimRectangle = BitmapTools.TrimRect(new Bitmap(imageData)); ;
+                TrimRectangle = BitmapTools.TrimRect(new Bitmap(imageData)); ;
             }
         }
 
@@ -109,29 +152,112 @@ namespace SpriteUtility.Data
             Data = null;
             Width = width;
             Height = height;
-            Polygons = new ObservableCollection<Polygon>();
-
+            Children = new ObservableCollection<INode>();
             CenterPointX = CenterPointY = 0;
-            Polygons.CollectionChanged += PolyCollectionChanged;
-
-            CenterPointChanged += OnCenterPointChanged;
         }
-        
-        public event EventHandler<EventArgs> CenterPointChanged;
-        public event EventHandler<EventArgs> IsOpenChanged;
 
-        protected virtual void OnCenterPointChanged(object sender, EventArgs e) { }
-        protected virtual void OnOpenClosedStateChanged(object sender, EventArgs e) { }
-
-        private void PolyCollectionChanged(object sender, EventArgs e)
+        public ImageFrame()
         {
-            Document.Instance.Invalidate(this, EventArgs.Empty);
+            Name = "Frame";
+            Children = new ObservableCollection<INode>();
         }
 
-        public void UpdateCenterPoint()
+        [JsonIgnore]
+        public SmartCommand<object> NewPolygonGroupCommand { get; private set; }
+
+        public bool CanExecuteNewPolygonGroupCommand(object o)
         {
-            CenterPointChanged(this, EventArgs.Empty);
-            Document.Instance.Invalidate(this, EventArgs.Empty);
+            return true;
         }
+
+        public void ExecuteNewPolygonGroupCommand(object o)
+        {
+            var polygonGroup = new PolygonGroup();
+            AddChild(polygonGroup);
+        }
+
+        [JsonIgnore]
+        public SmartCommand<object> MarkOpenClosedStateCommand { get; private set; }
+
+        public bool CanExecuteMarkOpenClosedStateCommand(object o)
+        {
+            return true;
+        }
+
+        public void ExecuteNewMarkOpenClosedStateCommand(object o)
+        {
+            this.IsOpen = !IsOpen;
+            if (Settings.Default.MarkAllAsOpen && IsOpen)
+            {
+                var index = this.Parent.Children.IndexOf(this);
+                for (int i = index; i < Parent.Children.Count; i++)
+                {
+                    (Parent.Children[i] as ImageFrame).IsOpen = true;
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public SmartCommand<object> AutoTraceCommand { get; private set; }
+
+        public bool CanExecuteAutoTraceCommand(object o)
+        {
+            return true;
+        }
+
+        public void ExecuteAutoTraceCommand(object o)
+        {
+            var dialog = new AutoTraceWindow();
+            dialog.ShowDialog();
+
+            var vm = dialog.DataContext as AutoTraceWindowVM;
+
+            if (vm.IsOk)
+            {
+                using (var ms = new MemoryStream(Data))
+                {
+                    var imageBitmap = Image.FromStream(ms);
+                    var errorBuilder = new StringBuilder();
+                    var shape = TraceService.CreateComplexShape(imageBitmap, 20000, errorBuilder,
+                        vm.HullTolerence,
+                        vm.AlphaTolerence,
+                        vm.MultipartDetection,
+                        vm.HoleDetection);
+
+
+                    if (shape != null)
+                    {
+                        var polygonGroup = new PolygonGroup("Body");
+                        var count = 1;
+                        foreach (var polygon in shape.Vertices)
+                        {
+                            var poly = new Polygon() { Name = "Polygon " + count };
+
+                            foreach (var point in polygon)
+                            {
+                                poly.AddChild(new PolyPoint((int)point.X, (int)point.Y));
+                            }
+
+                            polygonGroup.AddChild(poly);
+
+                            count++;
+                        }
+
+                        AddChild(polygonGroup);
+                    }
+
+                    ms.Close();
+                }
+            }
+        }
+
+        protected override void InitializeCommands()
+        {
+            NewPolygonGroupCommand = new SmartCommand<object>(ExecuteNewPolygonGroupCommand, CanExecuteNewPolygonGroupCommand);
+            MarkOpenClosedStateCommand = new SmartCommand<object>(ExecuteNewMarkOpenClosedStateCommand, CanExecuteMarkOpenClosedStateCommand);
+            AutoTraceCommand = new SmartCommand<object>(ExecuteAutoTraceCommand, CanExecuteAutoTraceCommand);
+            base.InitializeCommands();
+        }
+
     }
 }

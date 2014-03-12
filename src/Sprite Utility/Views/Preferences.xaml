@@ -1,0 +1,54 @@
+﻿<Window x:Class="Boxer.Views.Preferences"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="Preferences" Height="398" Width="677">
+    <Window.DataContext>
+        <Binding Path="Preferences" Source="{StaticResource Locator}"/>
+    </Window.DataContext>
+    <Grid>
+        <GroupBox Header="ImageViewer Colors" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="251" Width="271">
+            <Grid>
+                <Label Content="Background Color" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="Center Point Color" HorizontalAlignment="Left" Margin="9,41,0,0" VerticalAlignment="Top"/>
+                <Label Content="Polygon Color" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+                <Label Content="Border Color" HorizontalAlignment="Left" Margin="9,103,0,0" VerticalAlignment="Top"/>
+                <Label Content="Center Line Color" HorizontalAlignment="Left" Margin="9,134,0,0" VerticalAlignment="Top"/>
+                <Label Content="Trim Border Color" HorizontalAlignment="Left" Margin="9,165,0,0" VerticalAlignment="Top"/>
+                <Label Content="Polygon Selected Color" HorizontalAlignment="Left" Margin="9,196,0,0" VerticalAlignment="Top"/>
+
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="192,10,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.ViewerBackgroundColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="192,41,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.CenterPointColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="192,72,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.PolygonColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="192,103,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.BorderColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="192,134,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.CenterLineColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="192,165,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.TrimBorderColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="192,196,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.PolygonSelectedColor, Source={StaticResource Settings}}"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Stubs Colors" HorizontalAlignment="Left" Margin="286,12,0,0" VerticalAlignment="Top" Height="251" Width="372">
+            <Grid>
+                <Label Content="Document Stub Color" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <Label Content="Folder Stub Color" HorizontalAlignment="Left" Margin="9,41,0,0" VerticalAlignment="Top"/>
+                <Label Content="Image Stub Color" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+                <Label Content="Frame Stub Color" HorizontalAlignment="Left" Margin="9,103,0,0" VerticalAlignment="Top"/>
+                <Label Content="Polygon Group Stub Color Color" HorizontalAlignment="Left" Margin="9,134,0,0" VerticalAlignment="Top"/>
+                <Label Content="Polygon Stub Color" HorizontalAlignment="Left" Margin="9,165,0,0" VerticalAlignment="Top"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="298,10,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.DocumentStubColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="298,41,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.FolderStubColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="298,72,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.ImageStubColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="298,103,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.FrameStubColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="298,134,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.PolygonGroupStubColor, Source={StaticResource Settings}}"/>
+                <xctk:ColorPicker HorizontalAlignment="Left" Height="26" Margin="298,165,0,0" VerticalAlignment="Top" Width="57" SelectedColor="{Binding Default.PolygonStubColor, Source={StaticResource Settings}}"/>
+            </Grid>
+        </GroupBox>
+        <CheckBox Content="Draw border" HorizontalAlignment="Left" Margin="10,266,0,0" VerticalAlignment="Top" IsChecked="{Binding Default.DrawBorder, Source={StaticResource Settings}, Mode=TwoWay}"/>
+        <CheckBox Content="Fixed size center point" HorizontalAlignment="Left" Margin="10,286,0,0" VerticalAlignment="Top" IsChecked="{Binding Default.DrawLineArtForCenter, Source={StaticResource Settings}, Mode=TwoWay}"/>
+        <CheckBox Content="Mark all subsequent frames as open" HorizontalAlignment="Left" Margin="10,306,0,0" VerticalAlignment="Top" IsChecked="{Binding Default.MarkAllAsOpen, Source={StaticResource Settings}, Mode=TwoWay}"/>
+        <CheckBox Content="Trim to minimal non-transparent area" HorizontalAlignment="Left" Margin="10,326,0,0" VerticalAlignment="Top" IsChecked="{Binding Default.TrimToMinimalNonTransparentArea, Source={StaticResource Settings}, Mode=TwoWay}"/>
+        <Label Content="Simulation Ratio" HorizontalAlignment="Left" Margin="216,263,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="342,266,0,0" TextWrapping="Wrap" Text="{Binding Default.SimulationRatio, Source={StaticResource Settings}, Mode=TwoWay}" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Save" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" Command="{Binding SaveCommand}"/>
+
+    </Grid>
+</Window>

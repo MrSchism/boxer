@@ -1,7 +1,66 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Boxer.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ViewerBackgroundColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF7FFFD4</Value>
+    </Setting>
+    <Setting Name="CenterPointColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFFFFF</Value>
+    </Setting>
+    <Setting Name="PolygonColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFFFFF</Value>
+    </Setting>
+    <Setting Name="CenterLineColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFFF00</Value>
+    </Setting>
+    <Setting Name="BorderColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF000000</Value>
+    </Setting>
+    <Setting Name="TrimBorderColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFF0000</Value>
+    </Setting>
+    <Setting Name="DocumentStubColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF7FFFD4</Value>
+    </Setting>
+    <Setting Name="FolderStubColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFE4C4</Value>
+    </Setting>
+    <Setting Name="ImageStubColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF6495ED</Value>
+    </Setting>
+    <Setting Name="FrameStubColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF87CEFA</Value>
+    </Setting>
+    <Setting Name="PolygonStubColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFF0F8FF</Value>
+    </Setting>
+    <Setting Name="PolygonGroupStubColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFE0FFFF</Value>
+    </Setting>
+    <Setting Name="PolygonSelectedColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFF0000</Value>
+    </Setting>
+    <Setting Name="DrawLineArtForCenter" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DrawBorder" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TrimToMinimalNonTransparentArea" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ZoomIndex" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="CameraPos" Type="Microsoft.Xna.Framework.Vector2" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="SimulationRatio" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">128</Value>
+    </Setting>
+    <Setting Name="MarkAllAsOpen" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

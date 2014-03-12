@@ -1,73 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace SpriteUtility.Data
+namespace Boxer.Data
 {
-    [Serializable]
-    public class Polygon
+    public sealed class Polygon : NodeWithName
     {
-        private readonly bool _invalidateTrigger;
-        private readonly ObservableCollection<PolyPoint> _points;
-        private string _name;
-        private ImageFrame _frameParent;
-
         [JsonProperty("points")]
-        public ObservableCollection<PolyPoint> Points
+        public override ObservableCollection<INode> Children
         {
-            get { return _points; }
-        }
-
-        [JsonProperty("name")]
-        public string Name
-        {
-            get { return _name; }
+            get
+            {
+                return _children;
+            }
             set
             {
-                if (!_name.Equals(value))
-                {
-                    _name = value;
-                    if (NameChanged != null)
-                    {
-                        NameChanged(this, EventArgs.Empty);
-                    }
-                    Document.Instance.Invalidate(this, EventArgs.Empty);
-                }
+                Set(ref _children, value);
             }
         }
-        
+
         public Polygon()
         {
-            _points = new ObservableCollection<PolyPoint>();
-            _name = "New Poly";
-            _invalidateTrigger = true;
-            _points.CollectionChanged += PointCollectionChanged;
+            Name = "New Polygon";
+            Children = new ObservableCollection<INode>();
         }
 
-        public void SetFrameParent(ImageFrame parent)
+        [JsonConstructor]
+        public Polygon(ObservableCollection<PolyPoint> points)
+            : this()
         {
-            _frameParent = parent;
-        }
-
-        public event EventHandler<EventArgs> NameChanged;
-
-        protected virtual void OnPointsChanged(object sender, EventArgs e) { }
-
-        private void PointCollectionChanged(object sender, EventArgs e)
-        {
-            if (!_invalidateTrigger) return;
-            Document.Instance.Invalidate(this, EventArgs.Empty);
-        }
-
-        public ImageFrame GetFrameParent()
-        {
-            return _frameParent;
-        }
-
-        public void Add(PolyPoint point)
-        {
-            point.SetPolygonParent(this);
-            Points.Add(point);
+            foreach (var point in points)
+            {
+                AddChild(point);
+            }
         }
     }
 }

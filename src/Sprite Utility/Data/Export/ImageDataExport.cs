@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Boxer.Data;
 using Newtonsoft.Json;
 
 namespace SpriteUtility.Data.Export
@@ -16,8 +17,8 @@ namespace SpriteUtility.Data.Export
         public ImageDataExport(ImageData data)
         {
             ImageFile = data.Filename;
-            Frames = new List<ImageFrameExport>(data.Frames.Count);
-            foreach (var frame in data.Frames)
+            Frames = new List<ImageFrameExport>(data.Children.Count);
+            foreach (ImageFrame frame in data.Children)
             {
                 Frames.Add(new ImageFrameExport(frame));
             }

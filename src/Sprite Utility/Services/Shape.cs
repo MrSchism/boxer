@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using fwd;
 
-namespace SpriteUtility.Services
+namespace Boxer.Services
 {
     public class Shape
     {

@@ -2,80 +2,28 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Windows.Forms;
-using SpriteUtility.Data;
-using SpriteUtility.Data.Export;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Boxer.Core;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+using JsonSerializer = Boxer.Core.JsonSerializer;
 
-namespace SpriteUtility
+namespace Boxer.Data
 {
-    public class Document
+    public sealed class Document : NodeWithName
     {
-        private static bool m_TriggerInvalidate;
-        private readonly ObservableCollection<Folder> _folders;
-        private string m_Name;
-
-        private static Document _instance;
-        public static Document Instance
-        {
-            get { return _instance ?? (_instance = new Document()); }
-        }
-
-        public Document()
-        {
-            Saved = false;
-            FileName = "Not Saved";
-            m_Name = "New Project";
-            _folders = new ObservableCollection<Folder>();
-            ImageData.ResetNames();
-            m_TriggerInvalidate = true;
-            DocumentChanged += OnDocumentChanged;
-            DocumentSaved += OnDocumentSaved;
-            NameChanged += OnNameChanged;
-            _folders.CollectionChanged += FolderCollectionChanged;
-        }
-
-        [IgnoreDataMember]
-        public bool Saved { get; private set; }
-
-        public string Name
-        {
-            get { return m_Name; }
-            set
-            {
-                if (m_Name != value)
-                {
-                    m_Name = value;
-                    NameChanged(this, EventArgs.Empty);
-                    Invalidate(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        public ObservableCollection<Folder> Folders
-        {
-            get { return _folders; }
-        }
-
-        [IgnoreDataMember]
-        public string FileName { get; private set; }
-
-        public event EventHandler<EventArgs> DocumentChanged;
-        public event EventHandler<EventArgs> DocumentSaved;
-        public event EventHandler<EventArgs> NameChanged;
-
         public void Save(bool forceNewName)
         {
-            if (forceNewName || FileName == "Not Saved")
+            if (forceNewName || Filename == "Not Saved")
             {
                 SaveFileDialog Dialog = new SaveFileDialog();
                 Dialog.Filter = "Sprite Utility Files (*.suf)|*.suf";
-                ImageViewer.Paused = true;
-                DialogResult Result = Dialog.ShowDialog();
-                ImageViewer.Paused = false;
-                if (Result == DialogResult.OK)
+                var result = Dialog.ShowDialog();
+                if (result.Value)
                 {
-                    FileName = Dialog.FileName;
+                    Filename = Dialog.FileName;
                 }
                 else
                 {
@@ -84,128 +32,94 @@ namespace SpriteUtility
             }
 
             var json = JsonSerializer.Serialize(this);
-            File.WriteAllText(FileName, json);
-            
-            FolderCollectionChanged(this, EventArgs.Empty);
-            Saved = true;
-            DocumentSaved(this, EventArgs.Empty);
+            File.WriteAllText(Filename, json);
+
+            Glue.DocumentIsSaved = true;
         }
 
-        public static void New()
-        {
-            var document = new Document();
-            _instance = document;
-        }
-
-        public static void Open()
+        public static Document Open()
         {
             string fileName;
 
             var dialog = new OpenFileDialog();
             dialog.Filter = "Sprite Utility Files (*.suf)|*.suf";
-            ImageViewer.Paused = true;
-            DialogResult result = dialog.ShowDialog();
-            ImageViewer.Paused = false;
-            if (result == DialogResult.OK)
+            
+            var result = dialog.ShowDialog();
+            if (result.Value)
                 fileName = dialog.FileName;
             else
-                return;
+                return null;
 
             var json = File.ReadAllText(fileName);
             var deserialized = JsonSerializer.Deserialize<Document>(json);
-            SetFrameParents(deserialized.Folders);
 
+            deserialized.Filename = fileName;
+           // SetParentRecursivly(deserialized);
 
-            var newDocument = new Document { FileName = fileName };
-            newDocument.Saved = true;
-            newDocument.m_Name = deserialized.Name;
-            
-            m_TriggerInvalidate = true;
-            var folderCount = deserialized.Folders.Count;
-            m_TriggerInvalidate = false;
-            for (var i = 0; i < folderCount; i++)
-            {
-                var deserializedFolder = deserialized.Folders[i];
-                var newFolder = new Folder();
-                newFolder.Name = deserializedFolder.Name;
-                foreach (var folder in deserializedFolder.Folders)
-                {
-                    newFolder.Add(folder);
-                }
-                foreach (var image in deserializedFolder.Images)
-                {
-                    newFolder.Add(image);
-                }
-                newDocument.Folders.Add(newFolder);
-            }
-            m_TriggerInvalidate = true;
-            
-            _instance = newDocument;
-            _instance.Saved = true;
-
-
+            return deserialized;
         }
 
-        private static void SetFrameParents(IEnumerable<Folder> folders)
+        public static void SetParentRecursivly(INode node)
         {
-            // Flatten folder hierarchy
+            foreach (var child in node.Children)
+            {
+                child.Parent = node;
+                SetParentRecursivly(child);
+            }
+        }
+
+        [JsonProperty("folders")]
+        public override ObservableCollection<INode> Children
+        {
+            get
+            {
+                return _children;
+            }
+            set
+            {
+                Set(ref _children, value);
+            }
+        }
+
+        private string _filename;
+
+        public string Filename { get { return _filename; } set { Set(ref _filename, value); } }
+
+        public Document()
+        {
+            Name = "New Document";
+            Filename = "Not Saved";
+            Children = new ObservableCollection<INode>();
+        }
+
+         [JsonConstructor]
+        public Document(ObservableCollection<Folder> folders)
+            : this()
+        {
             foreach (var folder in folders)
             {
-                if (folder.Images != null)
-                {
-                    foreach (var image in folder.Images)
-                    {
-                        foreach (var frame in image.Frames)
-                        {
-                            foreach (var polygon in frame.Polygons)
-                            {
-                                polygon.SetFrameParent(frame);
-                                foreach (var point in polygon.Points)
-                                {
-                                    point.SetPolygonParent(polygon);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (folder.Folders != null)
-                {
-                    SetFrameParents(folder.Folders); 
-                }
+                AddChild(folder);
             }
         }
 
-        public void Export(string fileName)
+        [JsonIgnore]
+        public SmartCommand<object> NewFolderCommand { get; private set; }
+
+        public bool CanExecuteNewFolderCommand(object o)
         {
-            var export = new DocumentExport(this);
-            var json = JsonSerializer.Serialize(export);
-            File.WriteAllText(fileName, json);
+            return true;
         }
 
-        protected virtual void OnDocumentChanged(object sender, EventArgs e)
+        public void ExecuteNewFolderCommand(object o)
         {
+            var folder = new Folder();
+            AddChild(folder);
         }
 
-        protected virtual void OnDocumentSaved(object sender, EventArgs e)
+        protected override void InitializeCommands()
         {
-        }
-
-        protected virtual void OnNameChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void FolderCollectionChanged(object sender, EventArgs e)
-        {
-            Invalidate(this, EventArgs.Empty);
-        }
-
-        public void Invalidate(object sender, EventArgs e)
-        {
-            if (m_TriggerInvalidate)
-            {
-                DocumentChanged(sender, e);
-                Saved = false;
-            }
+            NewFolderCommand = new SmartCommand<object>(ExecuteNewFolderCommand, CanExecuteNewFolderCommand);
+            base.InitializeCommands();
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Boxer.Data;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using SpriteUtility.Data;
@@ -19,16 +20,16 @@ namespace SpriteUtility
         [JsonProperty("is_open")]
         public bool IsOpen { get; set; }
 
-        [JsonProperty("polygons")]
-        public List<PolygonExport> Polygons { get; set; }
+        [JsonProperty("polygonGroups")]
+        public List<PolygonGroupExport> PolygonGroups { get; set; }
 
         public ImageFrameExport(ImageFrame frame)
         {
             CenterPoint = new Vector2(frame.MappedCenterPointX, frame.MappedCenterPointY);
-            Polygons = new List<PolygonExport>(frame.Polygons.Count);
-            foreach (var poly in frame.Polygons)
+            PolygonGroups = new List<PolygonGroupExport>(frame.Children.Count);
+            foreach (PolygonGroup polyGroup in frame.Children)
             {
-                Polygons.Add(new PolygonExport(poly));
+                PolygonGroups.Add(new PolygonGroupExport(polyGroup));
             }
             Duration = frame.Duration;
             IsOpen = frame.IsOpen;

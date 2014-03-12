@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Boxer.Data;
 using Newtonsoft.Json;
 
 namespace SpriteUtility.Data.Export
@@ -17,7 +18,7 @@ namespace SpriteUtility.Data.Export
         {
             ProjectName = document.Name;
             Folders = new List<FolderExport>();
-            foreach (var folder in document.Folders)
+            foreach (Folder folder in document.Children)
             {
                 Folders.Add(new FolderExport(folder));
             }
