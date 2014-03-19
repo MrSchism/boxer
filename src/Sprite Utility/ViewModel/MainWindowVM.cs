@@ -144,6 +144,8 @@ namespace Boxer.ViewModel
             else if (e.NewValue is ImageFrame)
             {
                 _viewModelLocator.ImageFrameView.Frame = e.NewValue as ImageFrame;
+                _viewModelLocator.ImageFrameView.PolygonGroup = null;
+                _viewModelLocator.ImageFrameView.Polygon = null;
                 _viewModelLocator.ImageFrameView.ShowPolygonGroupTextBox = false;
                 _viewModelLocator.ImageFrameView.ShowPolygonTextBox = false;
                 CurrentView = _viewModelLocator.ImageFrameView;
@@ -152,6 +154,7 @@ namespace Boxer.ViewModel
             {
                 _viewModelLocator.ImageFrameView.Frame = (e.NewValue as PolygonGroup).Parent as ImageFrame;
                 _viewModelLocator.ImageFrameView.PolygonGroup = e.NewValue as PolygonGroup;
+                _viewModelLocator.ImageFrameView.Polygon = null;
                 _viewModelLocator.ImageFrameView.ShowPolygonGroupTextBox = true;
                 _viewModelLocator.ImageFrameView.ShowPolygonTextBox = false;
                 CurrentView = _viewModelLocator.ImageFrameView;
@@ -207,13 +210,13 @@ namespace Boxer.ViewModel
         {
             if (Glue.Document != null && !Glue.DocumentIsSaved)
             {
-                var result = MessageBox.Show("Would you like to save current document before opening another one?", "Save file", MessageBoxButton.YesNo);
+                var result = MessageBox.Show("Would you like to save the current project before opening another?", "Save file", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
                     Glue.Document.Save(false);
                 }
             }
-            Glue.Document = Document.Open();
+            Glue.Document = Document.Open(Glue);
             Glue.DocumentIsSaved = true;
             Documents.Clear();
             Documents.Add(Glue.Document);
@@ -240,8 +243,7 @@ namespace Boxer.ViewModel
 
         public void ExecuteOpenPreferencesWindowCommand(object o)
         {
-            var preferencesWindow = new Preferences();
-            preferencesWindow.ShowDialog();
+            CurrentView = _viewModelLocator.Preferences;
         }
 
         public SmartCommand<object> SaveAsCommand { get; private set; }

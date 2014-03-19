@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Boxer.Core;
-using Microsoft.Win32;
 using Newtonsoft.Json;
 using JsonSerializer = Boxer.Core.JsonSerializer;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace Boxer.Data
 {
@@ -37,7 +40,7 @@ namespace Boxer.Data
             Glue.DocumentIsSaved = true;
         }
 
-        public static Document Open()
+        public static Document Open(Glue glue)
         {
             string fileName;
 
@@ -46,26 +49,50 @@ namespace Boxer.Data
             
             var result = dialog.ShowDialog();
             if (result.Value)
+            {
                 fileName = dialog.FileName;
+            }
             else
+            {
                 return null;
+            }
 
-            var json = File.ReadAllText(fileName);
-            var deserialized = JsonSerializer.Deserialize<Document>(json);
+            Document deserialized = null;
+            Parallel.Invoke(() =>
+            {
+                var json = File.ReadAllText(fileName);
+                deserialized = JsonSerializer.Deserialize<Document>(json);
+                Application.DoEvents();
+                var dirty = EnsureDefaultsRecursively(deserialized.Children);
+                if (dirty)
+                {
+                    glue.DocumentIsSaved = false;
+                }
+            });
 
             deserialized.Filename = fileName;
-           // SetParentRecursivly(deserialized);
-
             return deserialized;
         }
 
-        public static void SetParentRecursivly(INode node)
+        public static bool EnsureDefaultsRecursively(ObservableCollection<INode> nodes, bool dirty = false, bool rebuildAll = false)
         {
-            foreach (var child in node.Children)
+            foreach (var node in nodes)
             {
-                child.Parent = node;
-                SetParentRecursivly(child);
+                if (node is ImageData)
+                {
+                    foreach (var frame in node.Children)
+                    {
+                        dirty |= ImageDataFactory.EnsureDefaults((ImageFrame)frame, rebuildAll);
+                    }
+                }
+
+                if (node is Folder)
+                {
+                    dirty |= EnsureDefaultsRecursively(node.Children, dirty, rebuildAll);
+                }
             }
+
+            return dirty;
         }
 
         [JsonProperty("folders")]
@@ -116,10 +143,28 @@ namespace Boxer.Data
             AddChild(folder);
         }
 
+        #region AddExistingFolderCommand
+         [JsonIgnore]
+        public SmartCommand<object> AddExistingFolderCommand { get; private set; }
+
+        public bool CanExecuteAddExistingFolderCommand(object o)
+        {
+            return true;
+        }
+
+        public async void ExecuteAddExistingFolderCommand(object o)
+        {
+            ImageDataFactory.ImportFromExistingDirectoryDialog(this);
+        }
+
+        #endregion
+
         protected override void InitializeCommands()
         {
+            AddExistingFolderCommand = new SmartCommand<object>(ExecuteAddExistingFolderCommand, CanExecuteAddExistingFolderCommand);  
             NewFolderCommand = new SmartCommand<object>(ExecuteNewFolderCommand, CanExecuteNewFolderCommand);
             base.InitializeCommands();
         }
+
     }
 }
